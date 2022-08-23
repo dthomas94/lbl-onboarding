@@ -15,8 +15,7 @@ export const convertCurrencies = async (
     `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${currencyCodeFrom}/${currencyCodeTo}.json`
   );
 
-  const value = await res.json().then((value) => value.currencyCodeTo);
-  console.log(value)
+  const value = await res.json().then((value) => value[currencyCodeTo]);
 
   return value;
 };
