@@ -1,3 +1,4 @@
+import { Button, ButtonGroup } from "@chakra-ui/react";
 import {
   Table,
   TableCaption,
@@ -12,18 +13,35 @@ import {
 import { useEffect, useState } from "react";
 import { getCurrencies } from "./utils";
 
+type Currencies = Array<Array<string>>;
+
 export const CurrencyTable = () => {
-  const [currencies, setCurrencies] = useState({});
+  const [currencies, setCurrencies] = useState<Currencies>([]);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [paginatedCurrencies, setPaginatedCurrencies] = useState<Currencies>([]);
+
+  const paginate = (arr: Currencies, page: number) => {
+    const res = arr.slice((page - 1) * 20, page * 20);
+    setPaginatedCurrencies(res);
+  };
 
   useEffect(() => {
     async function asyncGetCurrencies() {
       const res = await getCurrencies();
 
-      setCurrencies(res);
+      const mappedCurrencies = Object.entries(res).map((tuple) => tuple);
+      setCurrencies(mappedCurrencies);
+      paginate(mappedCurrencies, 1);
     }
 
     asyncGetCurrencies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    paginate(currencies, pageNumber);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageNumber]);
 
   return (
     <TableContainer>
@@ -36,7 +54,7 @@ export const CurrencyTable = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {Object.entries(currencies).map(([key, val]) => (
+          {paginatedCurrencies.map(([key, val]) => (
             <Tr key={key}>
               <Td>{key}</Td>
               <Td>{val}</Td>
@@ -50,6 +68,14 @@ export const CurrencyTable = () => {
           </Tr>
         </Tfoot>
       </Table>
+      <ButtonGroup>
+        {pageNumber > 1 && (
+          <Button onClick={() => setPageNumber(pageNumber - 1)}>Prev</Button>
+        )}
+        {currencies.length / 20 > pageNumber && (
+          <Button onClick={() => setPageNumber(pageNumber + 1)}>Next</Button>
+        )}
+      </ButtonGroup>
     </TableContainer>
   );
 };
