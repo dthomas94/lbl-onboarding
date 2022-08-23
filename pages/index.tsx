@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { Button } from "@chakra-ui/react";
 import { useUserStore } from "../store/user";
+import { CurrencyTable } from "../common/CurrencyTable/CurrencyTable";
 
 const Home: NextPage = () => {
   const login = useUserStore((state) => state.login);
@@ -16,7 +17,7 @@ const Home: NextPage = () => {
 
       <main>
         {user.loggedIn ? (
-          <h2>Welcome</h2>
+          <CurrencyTable />
         ) : (
           <Button colorScheme="blue" onClick={login}>
             Login
