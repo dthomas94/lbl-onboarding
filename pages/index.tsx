@@ -3,8 +3,6 @@ import Head from "next/head";
 import { Button, Heading, Highlight } from "@chakra-ui/react";
 import { useUserStore } from "../store/user";
 import {
-  Currencies,
-  Currency,
   CurrencyTable,
 } from "../common/CurrencyTable/CurrencyTable";
 import { useEffect, useState } from "react";
