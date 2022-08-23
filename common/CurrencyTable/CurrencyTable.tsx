@@ -13,9 +13,15 @@ import {
 import { useEffect, useState } from "react";
 import { getCurrencies } from "./utils";
 
-type Currencies = Array<Array<string>>;
+interface CurrencyTableProps {
+    onRowClick: (currencyCode: string, index: number) => void
+}
 
-export const CurrencyTable = () => {
+export type Currency = Array<string>;
+
+export type Currencies = Array<Currency>;
+
+export const CurrencyTable = ({onRowClick}: CurrencyTableProps) => {
   const [currencies, setCurrencies] = useState<Currencies>([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [paginatedCurrencies, setPaginatedCurrencies] = useState<Currencies>([]);
@@ -54,8 +60,8 @@ export const CurrencyTable = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {paginatedCurrencies.map(([key, val]) => (
-            <Tr key={key}>
+          {paginatedCurrencies.map(([key, val], index) => (
+            <Tr key={key} onClick={() => onRowClick(key, index)}>
               <Td>{key}</Td>
               <Td>{val}</Td>
             </Tr>

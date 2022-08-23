@@ -6,3 +6,17 @@ export const getCurrencies = async () => {
 
   return currencies;
 };
+
+export const convertCurrencies = async (
+  currencyCodeFrom: string,
+  currencyCodeTo: string
+) => {
+  const res = await fetch(
+    `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${currencyCodeFrom}/${currencyCodeTo}.json`
+  );
+
+  const value = await res.json().then((value) => value.currencyCodeTo);
+  console.log(value)
+
+  return value;
+};
