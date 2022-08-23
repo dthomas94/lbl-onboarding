@@ -1,35 +1,39 @@
 import { Box, Heading, Highlight } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { CurrencyTable } from "../common/CurrencyTable/CurrencyTable";
 import { convertCurrencies } from "../common/CurrencyTable/utils";
 
 interface SelectedCurrencies {
-  currencyFrom: { code: string; index: number | null };
-  currencyTo: { code: string; index: number | null };
+  currencyFrom: { code: string };
+  currencyTo: { code: string };
 }
 
 export const Currency = () => {
+  const router = useRouter();
   const [selectedCurrencies, selectCurrencies] = useState<SelectedCurrencies>({
-    currencyFrom: { code: "", index: null },
-    currencyTo: { code: "", index: null },
+    currencyFrom: { code: (router.query.currencyFrom as string) || "" },
+    currencyTo: { code: (router.query.currencyTo as string) || "" },
   });
   const [convertedValue, setConvertedValue] = useState<number>(0);
 
   const deselectCurrency = (isFrom: boolean = false) => {
+    const dir = isFrom ? "currencyFrom" : "currencyTo";
     selectCurrencies({
       ...selectedCurrencies,
-      [isFrom ? "currencyFrom" : "currencyTo"]: { code: "", index: null },
+      [dir]: { code: "" },
     });
+    router.push({ query: { ...router.query, [dir]: "" } });
   };
 
-  const selectCurrency = (
-    code: string,
-    index: number,
-    isFrom: boolean = false
-  ) => {
+  const selectCurrency = (code: string, isFrom: boolean = false) => {
+    const dir = isFrom ? "currencyFrom" : "currencyTo";
     selectCurrencies({
       ...selectedCurrencies,
-      [isFrom ? "currencyFrom" : "currencyTo"]: { code, index },
+      [dir]: { code },
+    });
+    router.push({
+      query: { ...router.query, [dir]: code },
     });
   };
 
@@ -43,9 +47,9 @@ export const Currency = () => {
     }
 
     if (!selectedCurrencies.currencyFrom.code) {
-      selectCurrency(currencyCode, index, true);
+      selectCurrency(currencyCode, true);
     } else if (!selectedCurrencies.currencyTo.code) {
-      selectCurrency(currencyCode, index);
+      selectCurrency(currencyCode);
     }
   };
 
