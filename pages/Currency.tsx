@@ -16,7 +16,7 @@ interface SelectedCurrencies {
   currencyTo: { code: string };
 }
 
-export const Currency = () => {
+const Currency = () => {
   const router = useRouter();
   const [selectedCurrencies, selectCurrencies] = useState<SelectedCurrencies>({
     currencyFrom: { code: (router.query.currencyFrom as string) || "" },
@@ -78,12 +78,25 @@ export const Currency = () => {
     if (currencyFrom.code && currencyTo.code) {
       asyncConvertCurrencies();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCurrencies]);
 
   return (
-    <Box display="flex" flexDir="column" padding="10" height="100vh" overflow="hidden">
-      <Heading lineHeight="tall" display="flex" justifyContent="center" flexDir="column" alignItems="center" rowGap="5">
+    <Box
+      display="flex"
+      flexDir="column"
+      padding="10"
+      height="100vh"
+      overflow="hidden"
+    >
+      <Heading
+        lineHeight="tall"
+        display="flex"
+        justifyContent="center"
+        flexDir="column"
+        alignItems="center"
+        rowGap="5"
+      >
         <Highlight
           query={[convertedValue?.toString()]}
           styles={{ px: "2", py: "1", rounded: "full", bg: "red.100" }}
@@ -104,3 +117,5 @@ export const Currency = () => {
     </Box>
   );
 };
+
+export default Currency;
