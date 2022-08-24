@@ -23,6 +23,7 @@ export type Currencies = Array<Currency>;
 
 export const CurrencyTable = ({ onRowClick }: CurrencyTableProps) => {
   const [currencies, setCurrencies] = useState<Currencies>([]);
+  const [filteredCurrencies, setFilteredCurrencies] = useState<Currencies>([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [paginatedCurrencies, setPaginatedCurrencies] = useState<Currencies>(
     []
@@ -48,7 +49,7 @@ export const CurrencyTable = ({ onRowClick }: CurrencyTableProps) => {
   }, []);
 
   useEffect(() => {
-    paginate(currencies, pageNumber);
+    paginate(filteredCurrencies, pageNumber);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNumber]);
 
@@ -57,10 +58,13 @@ export const CurrencyTable = ({ onRowClick }: CurrencyTableProps) => {
       const filteredCurrencies = currencies.filter(
         ([code, name]) => code.includes(searchVal) || name.includes(searchVal)
       );
-      paginate(filteredCurrencies, 1);
+      setFilteredCurrencies(filteredCurrencies);
+      paginate(filteredCurrencies, 1)
     } else {
-      paginate(currencies, 1);
+      setFilteredCurrencies(currencies);
+      paginate(currencies, 1)
     }
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchVal]);
 
@@ -117,7 +121,7 @@ export const CurrencyTable = ({ onRowClick }: CurrencyTableProps) => {
           Prev
         </Button>
         <Button
-          disabled={currencies.length / 20 <= pageNumber}
+          disabled={filteredCurrencies.length / 20 <= pageNumber}
           onClick={() => setPageNumber(pageNumber + 1)}
         >
           Next
