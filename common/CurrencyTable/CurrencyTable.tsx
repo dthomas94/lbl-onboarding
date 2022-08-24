@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Input } from "@chakra-ui/react";
 import {
   Table,
   TableCaption,
@@ -14,17 +14,20 @@ import { useEffect, useState } from "react";
 import { getCurrencies } from "./utils";
 
 interface CurrencyTableProps {
-    onRowClick: (currencyCode: string, index: number) => void
+  onRowClick: (currencyCode: string, index: number) => void;
 }
 
 export type Currency = Array<string>;
 
 export type Currencies = Array<Currency>;
 
-export const CurrencyTable = ({onRowClick}: CurrencyTableProps) => {
+export const CurrencyTable = ({ onRowClick }: CurrencyTableProps) => {
   const [currencies, setCurrencies] = useState<Currencies>([]);
   const [pageNumber, setPageNumber] = useState(1);
-  const [paginatedCurrencies, setPaginatedCurrencies] = useState<Currencies>([]);
+  const [paginatedCurrencies, setPaginatedCurrencies] = useState<Currencies>(
+    []
+  );
+  const [searchVal, setSearchVal] = useState<string>("");
 
   const paginate = (arr: Currencies, page: number) => {
     const res = arr.slice((page - 1) * 20, page * 20);
@@ -49,39 +52,77 @@ export const CurrencyTable = ({onRowClick}: CurrencyTableProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNumber]);
 
+  useEffect(() => {
+    if (searchVal) {
+      const filteredCurrencies = currencies.filter(
+        ([code, name]) => code.includes(searchVal) || name.includes(searchVal)
+      );
+      paginate(filteredCurrencies, 1);
+    } else {
+      paginate(currencies, 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchVal]);
+
   return (
-    <TableContainer overflowY="scroll">
-      <Table variant="striped">
-        <TableCaption>Currencies</TableCaption>
-        <Thead>
-          <Tr>
-            <Th>Code</Th>
-            <Th>Name</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {paginatedCurrencies.map(([key, val], index) => (
-            <Tr key={key} onClick={() => onRowClick(key, index)}>
-              <Td>{key}</Td>
-              <Td>{val}</Td>
+    <Box height="100%" overflow="scroll">
+      <Input
+        type="text"
+        value={searchVal}
+        onChange={(evt) => setSearchVal(evt.target.value)}
+        placeholder="Try 'jpy'"
+      />
+      <TableContainer height="90%" overflowY="scroll">
+        <Table variant="striped">
+          <TableCaption>Currencies</TableCaption>
+          <Thead>
+            <Tr>
+              <Th>Code</Th>
+              <Th>Name</Th>
             </Tr>
-          ))}
-        </Tbody>
-        <Tfoot>
-          <Tr>
-            <Th>Code</Th>
-            <Th>Name</Th>
-          </Tr>
-        </Tfoot>
-      </Table>
-      <ButtonGroup display="flex" justifyContent="center" columnGap="5">
-        {pageNumber > 1 && (
-          <Button onClick={() => setPageNumber(pageNumber - 1)}>Prev</Button>
-        )}
-        {currencies.length / 20 > pageNumber && (
-          <Button onClick={() => setPageNumber(pageNumber + 1)}>Next</Button>
-        )}
+          </Thead>
+          <Tbody>
+            {paginatedCurrencies.length ? (
+              paginatedCurrencies.map(([key, val], index) => (
+                <Tr key={key} onClick={() => onRowClick(key, index)}>
+                  <Td>{key}</Td>
+                  <Td>{val}</Td>
+                </Tr>
+              ))
+            ) : (
+              <Tr>
+                <Td>No results found</Td>
+                <Td></Td>
+              </Tr>
+            )}
+          </Tbody>
+          <Tfoot>
+            <Tr>
+              <Th>Code</Th>
+              <Th>Name</Th>
+            </Tr>
+          </Tfoot>
+        </Table>
+      </TableContainer>
+      <ButtonGroup
+        display="flex"
+        justifyContent="center"
+        columnGap="5"
+        marginTop="15"
+      >
+        <Button
+          disabled={pageNumber <= 1}
+          onClick={() => setPageNumber(pageNumber - 1)}
+        >
+          Prev
+        </Button>
+        <Button
+          disabled={currencies.length / 20 <= pageNumber}
+          onClick={() => setPageNumber(pageNumber + 1)}
+        >
+          Next
+        </Button>
       </ButtonGroup>
-    </TableContainer>
+    </Box>
   );
 };

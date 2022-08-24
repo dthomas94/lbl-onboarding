@@ -82,7 +82,7 @@ export const Currency = () => {
   }, [selectedCurrencies]);
 
   return (
-    <Box display="flex" flexDir="column" padding="10" height="100vh" overflow="scroll">
+    <Box display="flex" flexDir="column" padding="10" height="100vh" overflow="hidden">
       <Heading lineHeight="tall" display="flex" justifyContent="center" flexDir="column" alignItems="center" rowGap="5">
         <Highlight
           query={[convertedValue?.toString()]}
@@ -100,9 +100,7 @@ export const Currency = () => {
           <Text>{selectedCurrencies.currencyTo.code}</Text>
         </Box>
       </Heading>
-      <Box height="100%" overflow="scroll">
       <CurrencyTable onRowClick={updateCurrencies} />
-      </Box>
     </Box>
   );
 };
