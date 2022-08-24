@@ -50,7 +50,7 @@ export const CurrencyTable = ({onRowClick}: CurrencyTableProps) => {
   }, [pageNumber]);
 
   return (
-    <TableContainer>
+    <TableContainer overflowY="scroll">
       <Table variant="striped">
         <TableCaption>Currencies</TableCaption>
         <Thead>
@@ -74,7 +74,7 @@ export const CurrencyTable = ({onRowClick}: CurrencyTableProps) => {
           </Tr>
         </Tfoot>
       </Table>
-      <ButtonGroup>
+      <ButtonGroup display="flex" justifyContent="center" columnGap="5">
         {pageNumber > 1 && (
           <Button onClick={() => setPageNumber(pageNumber - 1)}>Prev</Button>
         )}

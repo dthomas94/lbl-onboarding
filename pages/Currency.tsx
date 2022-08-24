@@ -1,9 +1,16 @@
-import { Box, Heading, Highlight } from "@chakra-ui/react";
+import {
+  Box,
+  Heading,
+  Highlight,
+  Icon,
+  IconButton,
+  Text,
+} from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { CurrencyTable } from "../common/CurrencyTable/CurrencyTable";
 import { convertCurrencies } from "../common/CurrencyTable/utils";
-
+import { FaExchangeAlt as ReverseArrows } from "react-icons/fa";
 interface SelectedCurrencies {
   currencyFrom: { code: string };
   currencyTo: { code: string };
@@ -23,7 +30,6 @@ export const Currency = () => {
       ...selectedCurrencies,
       [dir]: { code: "" },
     });
-    router.push({ query: { ...router.query, [dir]: "" } });
   };
 
   const selectCurrency = (code: string, isFrom: boolean = false) => {
@@ -31,9 +37,6 @@ export const Currency = () => {
     selectCurrencies({
       ...selectedCurrencies,
       [dir]: { code },
-    });
-    router.push({
-      query: { ...router.query, [dir]: code },
     });
   };
 
@@ -53,6 +56,13 @@ export const Currency = () => {
     }
   };
 
+  const reverseCurrencies = () => {
+    selectCurrencies({
+      currencyFrom: { ...selectedCurrencies.currencyTo },
+      currencyTo: { ...selectedCurrencies.currencyFrom },
+    });
+  };
+
   useEffect(() => {
     const { currencyFrom, currencyTo } = selectedCurrencies;
     async function asyncConvertCurrencies() {
@@ -61,22 +71,38 @@ export const Currency = () => {
       setConvertedValue(res);
     }
 
+    router.push({
+      query: { currencyFrom: currencyFrom.code, currencyTo: currencyTo.code },
+    });
+
     if (currencyFrom.code && currencyTo.code) {
       asyncConvertCurrencies();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCurrencies]);
 
   return (
-    <Box>
-      <Heading lineHeight="tall">
+    <Box display="flex" flexDir="column" padding="10" height="100vh" overflow="scroll">
+      <Heading lineHeight="tall" display="flex" justifyContent="center" flexDir="column" alignItems="center" rowGap="5">
         <Highlight
-          query="spotlight"
+          query={[convertedValue?.toString()]}
           styles={{ px: "2", py: "1", rounded: "full", bg: "red.100" }}
         >
           {convertedValue?.toString()}
         </Highlight>
+        <Box display="flex" justifyContent="center" alignItems="center" gap="5">
+          <Text>{selectedCurrencies.currencyFrom.code}</Text>
+          <IconButton
+            aria-label="Reverse currencies"
+            icon={<ReverseArrows />}
+            onClick={reverseCurrencies}
+          />
+          <Text>{selectedCurrencies.currencyTo.code}</Text>
+        </Box>
       </Heading>
+      <Box height="100%" overflow="scroll">
       <CurrencyTable onRowClick={updateCurrencies} />
+      </Box>
     </Box>
   );
 };
