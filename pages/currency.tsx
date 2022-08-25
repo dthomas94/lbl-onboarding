@@ -11,18 +11,44 @@ import { useEffect, useState } from "react";
 import { CurrencyTable } from "../common/CurrencyTable/CurrencyTable";
 import { convertCurrencies } from "../common/CurrencyTable/utils";
 import { FaExchangeAlt as ReverseArrows } from "react-icons/fa";
+import { URLSearchParams } from "url";
 interface SelectedCurrencies {
   currencyFrom: { code: string };
   currencyTo: { code: string };
 }
 
-const Currency = () => {
+const asyncConvertCurrencies = async (
+  from: string,
+  to: string,
+  callback?: (value: number) => void
+) => {
+  const res = await convertCurrencies(from, to);
+
+  if (callback) callback(res.toString());
+};
+
+export async function getServerSideProps(ctx: {
+  query: { currencyFrom: string; currencyTo: string };
+}) {
+  const value = asyncConvertCurrencies(
+    ctx.query.currencyFrom,
+    ctx.query.currencyTo
+  );
+
+  return {
+    props: {
+      currencyValue: 0,
+    },
+  };
+}
+
+const Currency = ({ currencyValue }: { currencyValue: number }) => {
   const router = useRouter();
   const [selectedCurrencies, selectCurrencies] = useState<SelectedCurrencies>({
     currencyFrom: { code: (router.query.currencyFrom as string) || "" },
     currencyTo: { code: (router.query.currencyTo as string) || "" },
   });
-  const [convertedValue, setConvertedValue] = useState<number>(0);
+  const [convertedValue, setConvertedValue] = useState<number>(currencyValue);
 
   const deselectCurrency = (isFrom: boolean = false) => {
     const dir = isFrom ? "currencyFrom" : "currencyTo";
@@ -65,18 +91,25 @@ const Currency = () => {
 
   useEffect(() => {
     const { currencyFrom, currencyTo } = selectedCurrencies;
-    async function asyncConvertCurrencies() {
-      const res = await convertCurrencies(currencyFrom.code, currencyTo.code);
-
-      setConvertedValue(res);
+    if (currencyFrom.code && currencyTo.code) {
+      asyncConvertCurrencies(currencyFrom.code, currencyTo.code, (res) =>
+        setConvertedValue(res)
+      );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const { currencyFrom, currencyTo } = selectedCurrencies;
 
     router.push({
       query: { currencyFrom: currencyFrom.code, currencyTo: currencyTo.code },
     });
 
     if (currencyFrom.code && currencyTo.code) {
-      asyncConvertCurrencies();
+      asyncConvertCurrencies(currencyFrom.code, currencyTo.code, (res) =>
+        setConvertedValue(res)
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCurrencies]);
