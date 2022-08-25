@@ -42,6 +42,7 @@ export const CurrencyTable = ({ onRowClick }: CurrencyTableProps) => {
       const mappedCurrencies = Object.entries(res).map((tuple) => tuple);
       setCurrencies(mappedCurrencies);
       paginate(mappedCurrencies, 1);
+      setFilteredCurrencies(mappedCurrencies);
     }
 
     asyncGetCurrencies();
@@ -59,12 +60,12 @@ export const CurrencyTable = ({ onRowClick }: CurrencyTableProps) => {
         ([code, name]) => code.includes(searchVal) || name.includes(searchVal)
       );
       setFilteredCurrencies(filteredCurrencies);
-      paginate(filteredCurrencies, 1)
+      paginate(filteredCurrencies, 1);
     } else {
       setFilteredCurrencies(currencies);
-      paginate(currencies, 1)
+      paginate(currencies, 1);
     }
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchVal]);
 
