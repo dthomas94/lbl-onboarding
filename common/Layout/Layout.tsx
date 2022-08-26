@@ -30,7 +30,13 @@ export const Layout = ({
     if (!user.loggedIn && hasHydrated) {
       router.push("/");
     }
-  }, [hasHydrated, router, user.loggedIn]);
+
+    if (user.loggedIn && hasHydrated && router.pathname !== "currency") {
+      router.push("/currency");
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasHydrated, user.loggedIn]);
 
   return (
     <StyledLayout>
@@ -39,8 +45,11 @@ export const Layout = ({
         <meta name="description" content="Fun little app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {hasHydrated && user.loggedIn ? <Logout /> : <Login />}
-      <main>{children}</main>
+
+      <Box as={"main"} height="100%">
+        <Box>{hasHydrated && user.loggedIn ? <Logout /> : <Login />}</Box>
+        {children}
+      </Box>
     </StyledLayout>
   );
 };

@@ -8,4 +8,13 @@ export const StyledLayout = styled(Box)`
   justify-content: center;
   align-items: center;
   row-gap: 10px;
+
+  main {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 10px;
+  }
 `;
