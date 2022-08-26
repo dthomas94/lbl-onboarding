@@ -27,7 +27,7 @@ export const Layout = ({
   const hasHydrated = useHasHydrated();
 
   useEffect(() => {
-    if (!user.loggedIn && hasHydrated) {
+    if (!user.loggedIn || !hasHydrated) {
       router.push("/");
     }
 
@@ -36,7 +36,7 @@ export const Layout = ({
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasHydrated, user.loggedIn]);
+  }, [router.pathname, hasHydrated, user.loggedIn]);
 
   return (
     <StyledLayout>
