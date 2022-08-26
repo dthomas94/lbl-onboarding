@@ -88,13 +88,7 @@ const Currency = ({ currencyValue }: { currencyValue: number }) => {
   }, [selectedCurrencies]);
 
   return (
-    <Box
-      display="flex"
-      flexDir="column"
-      padding="10"
-      height="100vh"
-      overflow="hidden"
-    >
+    <Box display="flex" flexDir="column" padding="10">
       <Heading
         lineHeight="tall"
         display="flex"

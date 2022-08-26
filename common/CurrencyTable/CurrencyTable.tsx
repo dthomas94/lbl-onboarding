@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
 import { getCurrencies } from "./utils";
 import { ColumnDef } from "@tanstack/react-table";
@@ -65,7 +64,6 @@ export const CurrencyTable = ({ onRowClick }: CurrencyTableProps) => {
       onSearch={filterCurrencies}
       onRowClick={(row) => onRowClick(row.original.code)}
       pageSize={20}
-      tableHeight="calc(100vh - 550px)"
     />
   );
 };

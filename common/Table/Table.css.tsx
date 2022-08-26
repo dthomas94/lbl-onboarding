@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const StyledTable = styled.table`
   width: 100%;
-  height: ${(props) => props.tableHeight};
+  height: ${(props) => (props.tableHeight ? props.tableHeight : "100%")};
   background-color: ${(props) => (props.lightTheme ? "white" : "#4299e199")};
 
   th {
