@@ -11,30 +11,14 @@ import { useEffect, useState } from "react";
 import { CurrencyTable } from "../common/CurrencyTable/CurrencyTable";
 import { convertCurrencies } from "../common/CurrencyTable/utils";
 import { FaExchangeAlt as ReverseArrows } from "react-icons/fa";
-import { URLSearchParams } from "url";
 interface SelectedCurrencies {
   currencyFrom: { code: string };
   currencyTo: { code: string };
 }
 
-const asyncConvertCurrencies = async (
-  from: string,
-  to: string,
-  callback?: (value: number) => void
-) => {
-  const res = await convertCurrencies(from, to);
-
-  if (callback) callback(res.toString());
-};
-
 export async function getServerSideProps(ctx: {
   query: { currencyFrom: string; currencyTo: string };
 }) {
-  const value = asyncConvertCurrencies(
-    ctx.query.currencyFrom,
-    ctx.query.currencyTo
-  );
-
   return {
     props: {
       currencyValue: 0,
@@ -50,35 +34,31 @@ const Currency = ({ currencyValue }: { currencyValue: number }) => {
   });
   const [convertedValue, setConvertedValue] = useState<number>(currencyValue);
 
-  const deselectCurrency = (isFrom: boolean = false) => {
+  const toggleCurrency = (code: string, isFrom: boolean = false) => {
+    const shouldRemove =
+      selectedCurrencies.currencyFrom.code === code ||
+      selectedCurrencies.currencyTo.code === code;
     const dir = isFrom ? "currencyFrom" : "currencyTo";
     selectCurrencies({
       ...selectedCurrencies,
-      [dir]: { code: "" },
+      [dir]: { code: shouldRemove ? "" : code },
     });
   };
 
-  const selectCurrency = (code: string, isFrom: boolean = false) => {
-    const dir = isFrom ? "currencyFrom" : "currencyTo";
-    selectCurrencies({
-      ...selectedCurrencies,
-      [dir]: { code },
-    });
-  };
-
-  const updateCurrencies = (currencyCode: string, index: number) => {
-    if (selectedCurrencies.currencyFrom.code === currencyCode) {
-      deselectCurrency(true);
+  const updateCurrencies = (code: string) => {
+    if (selectedCurrencies.currencyFrom.code === code) {
+      toggleCurrency(code, true);
       return;
-    } else if (selectedCurrencies.currencyTo.code === currencyCode) {
-      deselectCurrency();
+    }
+    if (selectedCurrencies.currencyTo.code === code) {
+      toggleCurrency(code);
       return;
     }
 
     if (!selectedCurrencies.currencyFrom.code) {
-      selectCurrency(currencyCode, true);
+      toggleCurrency(code, true);
     } else if (!selectedCurrencies.currencyTo.code) {
-      selectCurrency(currencyCode);
+      toggleCurrency(code);
     }
   };
 
@@ -91,26 +71,19 @@ const Currency = ({ currencyValue }: { currencyValue: number }) => {
 
   useEffect(() => {
     const { currencyFrom, currencyTo } = selectedCurrencies;
-    if (currencyFrom.code && currencyTo.code) {
-      asyncConvertCurrencies(currencyFrom.code, currencyTo.code, (res) =>
-        setConvertedValue(res)
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const { currencyFrom, currencyTo } = selectedCurrencies;
-
     router.push({
       query: { currencyFrom: currencyFrom.code, currencyTo: currencyTo.code },
     });
 
-    if (currencyFrom.code && currencyTo.code) {
-      asyncConvertCurrencies(currencyFrom.code, currencyTo.code, (res) =>
-        setConvertedValue(res)
-      );
+    async function asyncConvertCurrencies() {
+      const res = await convertCurrencies(currencyFrom.code, currencyTo.code);
+
+      setConvertedValue(res.toString());
     }
+    if (currencyFrom.code && currencyTo.code) {
+      asyncConvertCurrencies();
+    }
+    // router should not be a dependency (see discussion: https://github.com/vercel/next.js/discussions/29403#discussioncomment-1908563)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCurrencies]);
 
